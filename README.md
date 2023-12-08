@@ -5,3 +5,11 @@
 - antd v5.12.1
 
 基于函数组件方式
+
+启动
+
+```shell
+npm i
+npm start
+```
+
