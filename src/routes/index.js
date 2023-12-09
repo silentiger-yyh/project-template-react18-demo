@@ -38,7 +38,7 @@ export const adminRoutes = [
     icon: <ShopOutlined />,
   },
   {
-    path: "/admin/products/edit/:id",
+    path: "/admin/products/edit/:id?", // ? 表示id是可选参数
     component: Edit,
     isShow: false,
   },

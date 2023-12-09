@@ -69,17 +69,23 @@ const dataSource = [
     price: 22.4,
   },
 ];
-function List() {
+function List(props) {
   return (
     <Card
       title="商品列表"
       extra={
-        <Button type="primary" size="small">
+        <Button
+          type="primary"
+          size="small"
+          onClick={() => {
+            props.history.push("/admin/products/edit");
+          }}
+        >
           新增
         </Button>
       }
     >
-      <Table columns={columns} bordered dataSource={dataSource} rowKey="key" />
+      <Table columns={columns} bordered dataSource={dataSource} rowKey="id" />
     </Card>
   );
 }

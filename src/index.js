@@ -11,6 +11,7 @@ import App from "./App";
 import "antd/dist/antd";
 import { mainRoutes } from "./routes/index";
 import reportWebVitals from "./reportWebVitals";
+import { isLogined } from "./utils/auth";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -24,9 +25,16 @@ root.render(
         {/* routeProps 是干嘛的 */}
         <Route path="/admin" render={(routeProps) => <App {...routeProps} />} />
         {mainRoutes.map((route) => {
+          // 如果已经登陆过，不能重复登录，需要跳转到管理页面
+          if (route.path == "/login" && isLogined) {
+            // console.log("已经登陆过啦");
+            return <Redirect from="/" to="/admin" />;
+          }
           return <Route key={route.path} {...route}></Route>;
         })}
         {/*Redirect：一般写在所有路由注册的最下方，当所有路由都无法匹配时，跳转到Redirect指定的路由 */}
+        {/* 没有匹配到任何路由，访问根路由跳转到admin管理页 */}
+        <Redirect from="/" to="/admin" />
         <Redirect to="/404" />
       </Switch>
     </Router>
