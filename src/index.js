@@ -26,8 +26,8 @@ root.render(
         <Route path="/admin" render={(routeProps) => <App {...routeProps} />} />
         {mainRoutes.map((route) => {
           // 如果已经登陆过，不能重复登录，需要跳转到管理页面
-          if (route.path == "/login" && isLogined) {
-            // console.log("已经登陆过啦");
+          if (route.path === "/login" && isLogined()) {
+            // console.log("已经登陆过啦:", isLogined());
             return <Redirect from="/" to="/admin" />;
           }
           return <Route key={route.path} {...route}></Route>;
@@ -40,8 +40,4 @@ root.render(
     </Router>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
