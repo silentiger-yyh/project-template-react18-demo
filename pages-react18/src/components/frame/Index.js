@@ -3,34 +3,71 @@ import {
   LaptopOutlined,
   NotificationOutlined,
   UserOutlined,
+  DownOutlined,
+  SmileOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import {
+  Breadcrumb,
+  Layout,
+  Menu,
+  theme,
+  Dropdown,
+  Space,
+  Avatar,
+  message,
+} from "antd";
 import { adminRoutes } from "../../routes/index";
+import { useHistory, withRouter } from "react-router-dom";
 import logo from "./logo.png";
-import { useHistory } from "react-router-dom";
+import "./frame.css";
+import { clearToken } from "../../utils/auth";
 
 const { Header, Content, Sider } = Layout;
 const routes = adminRoutes.filter((route) => route.isShow);
-
+const items = [
+  {
+    key: "1",
+    label: "通知中心",
+  },
+  {
+    key: "2",
+    label: "设置",
+  },
+  {
+    key: "logout",
+    label: "退出",
+  },
+];
 function Index(props) {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
   const history = useHistory();
+
+  const onClick = ({ key }) => {
+    if (key === "logout") {
+      clearToken();
+      history.push("/login");
+    } else {
+      message.info(key);
+    }
+  };
   return (
     <Layout>
-      <Header
-        className="header"
-        style={{
-          // display: 'flex',
-          // alignItems: 'center',
-          background: "#428bca", // header背景色，和logo同色
-        }}
-      >
+      <Header className="header">
         <div className="logo">
           <img src={logo} alt="logo"></img>
         </div>
-        {/* <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} items={items1} /> */}
+        <Dropdown menu={{ items, onClick }}>
+          <a>
+            {/* <a onClick={(e) => e.preventDefault()}> */}
+            <Space>
+              <Avatar>U</Avatar>
+              <span>管理员</span>
+              <DownOutlined />
+            </Space>
+          </a>
+        </Dropdown>
       </Header>
       <Layout>
         <Sider
@@ -53,26 +90,11 @@ function Index(props) {
                 icon: route.icon,
                 label: route.title,
                 onClick: (item, key, keyPath, domEvent) => {
-                  history.push(route.path);
+                  props.history.push(route.path);
                 },
-                // children: new Array(4).fill(null).map((_, j) => {
-                //   const subKey = index++;
-                //   return {
-                //     key: subKey,
-                //     label: `option${subKey}`,
-                //   };
-                // }),
               };
             })}
-          >
-            {/* {routes.map(route => {
-              return (
-                <Menu.Item key={route.path} icon={route.icon}>
-                  {route.title}
-                </Menu.Item>
-              )
-            })} */}
-          </Menu>
+          ></Menu>
         </Sider>
         <Layout
           style={{
@@ -104,4 +126,4 @@ function Index(props) {
   );
 }
 
-export default Index;
+export default withRouter(Index);

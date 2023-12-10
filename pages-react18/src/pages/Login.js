@@ -1,18 +1,30 @@
 import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Card, Space } from "antd";
+import { Button, Checkbox, Form, Input, Card, Space, message } from "antd";
 import { setToken } from "../utils/auth";
+import { loginApi } from "../service/auth";
 import "./login.css";
 
 function Login(props) {
+  // 表单验证通过后调用
   const onFinish = (values) => {
-    console.log("Received values of form: ", values);
-    setToken(values.username);
-    props.history.push("/admin/dashboard");
+    // setToken(values.username);
+    // props.history.push("/admin/dashboard");
+    loginApi({
+      username: values.username,
+      password: values.password,
+    })
+      .then((res) => {
+        message.success(res);
+        props.history.push("/admin/dashboard");
+      })
+      .catch((err) => {
+        message.error(err.message);
+      });
   };
   return (
     <Space direction="vertical" size={16}>
-      <Card title="YYH Admin Sys" className="login-form-card">
+      <Card title="uuY Admin Sys" className="login-form-card">
         <Form
           name="normal_login"
           className="login-form"
