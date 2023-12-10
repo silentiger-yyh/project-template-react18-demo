@@ -5,8 +5,8 @@ import { get, post, put, del } from "../utils/request";
  * @param {*} data
  * @returns
  */
-export function listApi(data) {
-  return get("/api/v1/admin/products", data);
+export function listApi(page = 1) {
+  return get("/api/v1/admin/products", { page, per: 2 });
 }
 
 /**
@@ -18,6 +18,14 @@ export function createApi(data) {
   return post("/api/v1/admin/products", data);
 }
 
+/**
+ * 根据id获取数据
+ * @param {*} id
+ * @returns
+ */
+export function getOneById(id) {
+  return get(`/api/v1/admin/products/${id}`);
+}
 /**
  * 修改数据
  * @param {*} id

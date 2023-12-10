@@ -2,16 +2,22 @@ import axios from "axios";
 import { getToken } from "./auth";
 
 const instance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "http://localhost:3009",
   timeout: 3000,
 });
 
 // 全局请求拦截，参考https://github.com/axios/axios?tab=readme-ov-file#interceptors
 // 发送请求之前执行
-axios.interceptors.request.use(
+instance.interceptors.request.use(
   function (config) {
-    // Do something before request is sent
-    config.headers["authorization"] = "uuY" + getToken();
+    /*
+    Bearer 是授权的类型，常见的授权类型有：
+      Basic 用于 http-basic 认证；
+      Bearer 常见于 OAuth 和 JWT 授权；
+      Digest MD5 哈希的 http-basic 认证
+      AWS4-HMAC-SHA256 授权
+    */
+    config.headers["authorization"] = "Bearer " + getToken();
     return config;
   },
   function (error) {
@@ -22,8 +28,9 @@ axios.interceptors.request.use(
 
 // 全局响应拦截，参考https://github.com/axios/axios?tab=readme-ov-file#interceptors
 // 请求返回之后执行
-axios.interceptors.response.use(
+instance.interceptors.response.use(
   function (response) {
+    // 可以对返回的结果进行过滤，比如，响应中又多层嵌套，我们直接取数据层
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
     return response;
@@ -42,7 +49,7 @@ axios.interceptors.response.use(
  * @returns
  */
 export function get(url, params) {
-  return axios.get(url, {
+  return instance.get(url, {
     params,
   });
 }
@@ -54,7 +61,7 @@ export function get(url, params) {
  * @returns
  */
 export function post(url, data) {
-  return axios.post(url, data);
+  return instance.post(url, data);
 }
 
 /**
@@ -64,7 +71,7 @@ export function post(url, data) {
  * @returns
  */
 export function put(url, data) {
-  return axios.put(url, data);
+  return instance.put(url, data);
 }
 
 /**
@@ -73,5 +80,5 @@ export function put(url, data) {
  * @returns
  */
 export function del(url) {
-  return axios.del(url);
+  return instance.del(url);
 }

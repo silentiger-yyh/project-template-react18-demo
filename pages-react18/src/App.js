@@ -30,12 +30,16 @@ function App() {
           );
         })}
         {/* 如果上面没匹配到，但是能匹配到以admin开头的话就跳转到to指定的路由 */}
-        <Redirect to={adminRoutes[0].path} from="/admin/" />{" "}
-        <Redirect to="/404" />
+        <Redirect
+          to={adminRoutes[0].path}
+          from="/admin/"
+          key={adminRoutes[0].path}
+        />{" "}
+        <Redirect to="/404" key="/404" />
       </Switch>
     </Frame>
   ) : (
-    <Redirect to="/login" />
+    <Redirect to="/login" key="/login" />
   );
 }
 

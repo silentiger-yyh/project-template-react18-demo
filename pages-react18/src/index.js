@@ -23,12 +23,16 @@ root.render(
       {/* 如果不使用 Switch 组件进行包裹，相同 path 的就会被匹配到，然后一起展示*/}
       <Switch>
         {/* routeProps 是干嘛的 */}
-        <Route path="/admin" render={(routeProps) => <App {...routeProps} />} />
+        <Route
+          path="/admin"
+          key="/admin"
+          render={(routeProps) => <App {...routeProps} />}
+        />
         {mainRoutes.map((route) => {
           // 如果已经登陆过，不能重复登录，需要跳转到管理页面
           if (route.path === "/login" && isLogined()) {
             // console.log("已经登陆过啦:", isLogined());
-            return <Redirect from="/" to="/admin" />;
+            return <Redirect from="/" to="/admin" key="/admin" />;
           }
           return <Route key={route.path} {...route}></Route>;
         })}

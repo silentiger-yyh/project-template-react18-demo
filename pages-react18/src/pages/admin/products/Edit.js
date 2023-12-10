@@ -1,13 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Card, Input, message, Button } from "antd";
+import { createApi, getOneById, modifyOne } from "../../../service/products";
 
 function Edit(props) {
+  // props.match.params.id存在的话表示修改,否怎为新增
+  // console.log(props, "~~~~~");
+
   const [form] = Form.useForm();
-  const onFinish = () => {
-    message.success("Submit success!");
+  // 定义局部状态
+  // const [currentData, setCurrentData] = useState({
+  //   name: "111",
+  //   price: 0,
+  // });
+
+  // 初始化当前组件获取当前组件的参数，并且需要使用useEffect，否则会一直发送请求
+  useEffect(() => {
+    if (props.match.params.id) {
+      getOneById(props.match.params.id)
+        .then((res) => {
+          console.log("数据", res.data);
+          // setCurrentData(res.data);
+          form.setFieldsValue(res.data);
+        })
+        .catch((err) => {
+          message.error(err.message);
+        });
+    }
+  }, []);
+  // 提交表单且数据验证成功后回调事件
+  const onFinish = (val) => {
+    if (props.match.params.id) {
+      modifyOne(props.match.params.id, val)
+        .then((res) => {
+          message.success("保存成功");
+        })
+        .catch((err) => {
+          message.error(err.message);
+        });
+    } else {
+      createApi(val)
+        .then((res) => {
+          message.success("保存成功");
+        })
+        .catch((err) => {
+          message.error(err.message);
+        });
+    }
   };
-  const onFinishFailed = () => {
-    message.error("Submit failed!");
+  // 提交表单且数据验证失败后回调事件
+  const onFinishFailed = (msg) => {
+    console.log(msg);
+    // message.error(msg);
   };
   /**
    * 自定义校验规则
@@ -36,9 +79,10 @@ function Edit(props) {
       <Form
         form={form}
         layout="horizontal"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+        onFinish={onFinish} // 提交表单且数据验证成功后回调事件
+        onFinishFailed={onFinishFailed} // 提交表单且数据验证失败后回调事件
         autoComplete="off"
+        // initialValues={{ name: currentData.name }} // 这里只会在第一次进行渲染，后续数据的更新并不会造成重新渲染。所以，initialValues不适用于动态设置表单初始值。
       >
         <Form.Item
           name="name"

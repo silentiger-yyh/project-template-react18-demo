@@ -11,12 +11,18 @@ function Login(props) {
     // setToken(values.username);
     // props.history.push("/admin/dashboard");
     loginApi({
-      username: values.username,
+      userName: values.username,
       password: values.password,
     })
       .then((res) => {
-        message.success(res);
-        props.history.push("/admin/dashboard");
+        if (res.status === 200) {
+          // console.log(res);
+          setToken(res.data.token);
+          props.history.push("/admin");
+          message.success("登录成功");
+        } else {
+          message.error("登录失败");
+        }
       })
       .catch((err) => {
         message.error(err.message);
