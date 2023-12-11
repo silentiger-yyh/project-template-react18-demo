@@ -81,3 +81,144 @@ useEffect(() => {
     });
 }, []);
 ```
+
+## 如何跨组件传参（状态存储库的使用）
+
+需要几个插件：
+
+> - redux：
+> - react-redux：用作 react 和 redux 关联
+> - redux-thunk：做异步请求的
+
+18.x新版中被`@reduxjs/toolkit`替代，只需要安装：
+
+```sh
+npm install @reduxjs/toolkit react-redux
+```
+
+**场景：notice组件中全部已读，frame 组件中的用户名上面的小红点取消**
+
+第一步：定义slice，创建noticSlice.js
+
+```js
+import {createSlice} from "@reduxjs/toolkit";
+
+const initialState = {
+    count: 0,
+    isAllRead: false
+};
+export const noticeSlice = createSlice({
+    name: "noticeSlice", // 命名空间，在调用action的时候会默认的设置为action的前缀,保证唯一.不重名
+    initialState: initialState,
+    reducers: {
+        // reducer函数 state当前组件的数据
+        //第二个参数为{payload:{},type:"""}
+        increment(state) {
+            state.count ++;
+            state.isAllRead = false
+        },
+        // 标记已读
+        decrement(state) {
+            if (state.count > 0) {
+                state.count --;
+                if (state.count === 0) {
+                    state.isAllRead = true
+                }
+            }else {
+                state.isAllRead = true
+            }
+        },
+        readAll(state) {
+            state.count = 0;
+            state.isAllRead = true;
+        },
+        setNotice(state, {payload}) {
+            state.count = payload.count
+            if (payload.count > 0) {
+                state.isAllRead = false
+            }
+        }
+    },
+});
+export const { increment, decrement,readAll,setNotice} = noticeSlice.actions;
+export const selectCount = (state) => state.noticeSlice.count;
+export const selectIsAllRead = (state) => state.noticeSlice.isAllRead;
+export default noticeSlice.reducer;
+
+```
+
+第二步：src 目录下创建 store.js 文件
+
+```js
+import { configureStore } from "@reduxjs/toolkit";
+import noticeSlice from "./actions/noticeSlice";
+export default  configureStore({
+  reducer: {
+    noticeSlice
+  }
+})
+```
+
+**第三步**：在 src 的 index.js 中使用 Provider 包裹组件
+
+```react
+import { Provider } from "react-redux";
+import store from "./store";
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <Provider store={store}>
+    <React.StrictMode>
+      <Router>
+        <Switch>
+          <Route
+            path="/admin"
+          />
+          <Redirect to="/404" />
+        </Switch>
+      </Router>
+    </React.StrictMode>
+  </Provider>
+);
+reportWebVitals();
+```
+
+第四步：在notice组件中使用
+
+```react
+import {useDispatch, useSelector} from "react-redux";
+
+const count = useSelector(selectCount)
+const isAllRead = useSelector(selectIsAllRead)
+const dispatch = useDispatch()
+// 初始化通知数量
+useEffect(() => {
+    // 这里可以做异步接口请求
+    dispatch(setNotice({count:50}))
+}, []);
+return (
+    <Card title="通知中心" extra={<Button size="small" onClick={() => dispatch(readAll())}>全部标记为已读</Button>}>
+        {count}
+        {/*<Button size="small" onClick={() => dispatch(increment())}>+1</Button>*/}
+        <List
+            header={<div>Header</div>}
+            footer={<div>Footer</div>}
+            bordered
+            dataSource={data}
+            renderItem={(item) => (
+                <List.Item style={{display: "flex", alignContent: "space-between"}}>
+                    <Typography.Text mark>[ITEM]</Typography.Text> {item}
+                    <Button size="small" onClick={() => dispatch(decrement())}>标记为已读</Button>
+                </List.Item>
+            )}
+        />
+    </Card>
+);
+```
+
+第五步：在frame组件中使用
+
+```react
+<Badge dot={!useSelector(selectIsAllRead)}>
+  <span>管理员</span>
+</Badge>
+```

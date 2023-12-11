@@ -4,6 +4,7 @@ import Edit from "../pages/admin/products/Edit";
 import List from "../pages/admin/products/List";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import Notice from "../pages/admin/notice/Index";
 
 import { ShopOutlined, AreaChartOutlined } from "@ant-design/icons";
 export const mainRoutes = [
@@ -40,6 +41,11 @@ export const adminRoutes = [
   {
     path: "/admin/products/edit/:id?", // ? 表示id是可选参数
     component: Edit,
+    isShow: false,
+  },
+  {
+    path: "/admin/notice", // ? 表示id是可选参数
+    component: Notice,
     isShow: false,
   },
 ];

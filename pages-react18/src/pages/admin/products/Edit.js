@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Form, Card, Input, message, Button } from "antd";
+import { Form, Card, Input, message, Button, Upload } from "antd";
 import { createApi, getOneById, modifyOne } from "../../../service/products";
+import { serverUrl } from "../../../utils/config";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
 function Edit(props) {
   // props.match.params.id存在的话表示修改,否怎为新增
   // console.log(props, "~~~~~");
 
   const [form] = Form.useForm();
+  const [imageUrl, setImageUrl] = useState("");
+  const [loading, setLoading] = useState(false);
   // 定义局部状态
   // const [currentData, setCurrentData] = useState({
   //   name: "111",
@@ -18,9 +22,9 @@ function Edit(props) {
     if (props.match.params.id) {
       getOneById(props.match.params.id)
         .then((res) => {
-          console.log("数据", res.data);
-          // setCurrentData(res.data);
-          form.setFieldsValue(res.data);
+          // console.log("数据", res.data);
+          form.setFieldsValue(res.data); // 显示表单数据
+          setImageUrl(res.data.coverImg); //显示图片
         })
         .catch((err) => {
           message.error(err.message);
@@ -30,7 +34,7 @@ function Edit(props) {
   // 提交表单且数据验证成功后回调事件
   const onFinish = (val) => {
     if (props.match.params.id) {
-      modifyOne(props.match.params.id, val)
+      modifyOne(props.match.params.id, { ...val, coverImg: imageUrl })
         .then((res) => {
           message.success("保存成功");
         })
@@ -38,7 +42,7 @@ function Edit(props) {
           message.error(err.message);
         });
     } else {
-      createApi(val)
+      createApi({ ...val, coverImg: imageUrl })
         .then((res) => {
           message.success("保存成功");
         })
@@ -74,6 +78,35 @@ function Edit(props) {
       return Promise.reject("请输入数字");
     }
   };
+  const handleChange = (info) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      // 上传成功
+      setLoading(false);
+      setImageUrl(info.file.response.info);
+
+      // Get this url from response in real world.
+      // getBase64(info.file.originFileObj, (url) => {
+      //   setLoading(false);
+      //   setImageUrl(url);
+      // });
+    }
+  };
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
   return (
     <Card title="商品编辑">
       <Form
@@ -117,6 +150,28 @@ function Edit(props) {
           ]}
         >
           <Input placeholder="请输入商品价格" />
+        </Form.Item>
+        <Form.Item label="主图">
+          <Upload
+            name="file"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            action={serverUrl + "/api/v1/common/file_upload"}
+            onChange={handleChange}
+          >
+            {imageUrl ? (
+              <img
+                src={serverUrl + imageUrl}
+                alt="avatar"
+                style={{
+                  width: "100%",
+                }}
+              />
+            ) : (
+              uploadButton
+            )}
+          </Upload>
         </Form.Item>
         <Form.Item>
           <Button htmlType="submit" type="primary">

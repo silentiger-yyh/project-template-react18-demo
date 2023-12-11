@@ -80,5 +80,5 @@ export function put(url, data) {
  * @returns
  */
 export function del(url) {
-  return instance.del(url);
+  return instance.delete(url);
 }

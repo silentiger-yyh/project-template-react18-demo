@@ -3,7 +3,7 @@ import "./App.css";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { adminRoutes } from "./routes";
 import Frame from "./components/frame/Index";
-import { isLogined } from "./utils/auth";
+import { isExpired, isLogined } from "./utils/auth";
 import "./App.css";
 /* 
 导入带花括号和不带花括号的区别是什么？？？？？
@@ -12,7 +12,7 @@ import "./App.css";
 */
 function App() {
   // 使用三目运算判断是否登录，登录了就跳转到管理页面，否则跳转到登录页面
-  return isLogined() ? (
+  return isLogined() && !isExpired() ? ( // 已经登录且没有过期
     <Frame>
       <Switch>
         {/* 遍历adminRoute下面的所有路由 */}

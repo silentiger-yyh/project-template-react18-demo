@@ -15,18 +15,21 @@ import {
   Space,
   Avatar,
   message,
+  Badge,
 } from "antd";
 import { adminRoutes } from "../../routes/index";
 import { useHistory, withRouter } from "react-router-dom";
 import logo from "./logo.png";
 import "./frame.css";
 import { clearToken } from "../../utils/auth";
+import {useSelector} from "react-redux";
+import {selectCount, selectIsAllRead} from "../../store/actions/noticeSlice";
 
 const { Header, Content, Sider } = Layout;
 const routes = adminRoutes.filter((route) => route.isShow);
 const items = [
   {
-    key: "1",
+    key: "notice",
     label: "通知中心",
   },
   {
@@ -45,11 +48,21 @@ function Index(props) {
   const history = useHistory();
 
   const onClick = ({ key }) => {
-    if (key === "logout") {
-      clearToken();
-      history.push("/login");
-    } else {
-      message.info(key);
+    switch (key) {
+      case "logout":
+        {
+          clearToken();
+          history.push("/login");
+        }
+        break;
+      case "notice":
+        {
+          history.push("/admin/notice");
+        }
+        break;
+      default:
+        message.info(key);
+        break;
     }
   };
   return (
@@ -63,7 +76,9 @@ function Index(props) {
             {/* <a onClick={(e) => e.preventDefault()}> */}
             <Space>
               <Avatar>U</Avatar>
-              <span>管理员</span>
+              <Badge dot={!useSelector(selectIsAllRead)}>
+                <span>管理员</span>
+              </Badge>
               <DownOutlined />
             </Space>
           </a>
@@ -90,7 +105,7 @@ function Index(props) {
                 icon: route.icon,
                 label: route.title,
                 onClick: (item, key, keyPath, domEvent) => {
-                  props.history.push(route.path);
+                  history.push(route.path);
                 },
               };
             })}
@@ -126,4 +141,4 @@ function Index(props) {
   );
 }
 
-export default withRouter(Index);
+export default Index;
